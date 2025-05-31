@@ -1,0 +1,63 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Install AnkiTools Dependencies (Editable)",
+            "type": "shell",
+            // Assuming pip is available in the path.
+            // For Windows, explicitly using cmd might be more robust for some environments,
+            // or powershell if that's the default terminal.
+            // Using 'pwsh' as per system information.
+            "command": "pip install -e .",
+            "options": {
+                // The command should be run from the ankitools_project directory
+                "cwd": "${workspaceFolder}/ankitools_project"
+            },
+            "problemMatcher": [], // No problem matcher needed for pip install
+            "group": {
+                "kind": "build",
+                "isDefault": true // Makes this the default build task (Ctrl+Shift+B)
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "detail": "Installs the AnkiTools package in editable mode along with its dependencies from pyproject.toml."
+        },
+        {
+            "label": "Create/Activate Virtual Environment and Install (AnkiTools)",
+            "type": "shell",
+            "command": "python -m venv .venv && .venv/Scripts/activate && pip install -e .",
+            // For PowerShell, activation is different: ".venv\\Scripts\\Activate.ps1"
+            // This is a more complex example and might need adjustment based on user's shell preference.
+            // The command below is for pwsh (PowerShell Core)
+            "windows": {
+                 "command": "if (-not (Test-Path .venv)) { python -m venv .venv }; .\\.venv\\Scripts\\Activate.ps1; pip install -e ."
+            },
+            "linux": {
+                "command": "if [ ! -d \".venv\" ]; then python3 -m venv .venv; fi; source .venv/bin/activate; pip install -e ."
+            },
+            "osx": {
+                 "command": "if [ ! -d \".venv\" ]; then python3 -m venv .venv; fi; source .venv/bin/activate; pip install -e ."
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/ankitools_project"
+            },
+            "problemMatcher": [],
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new", // Use a new panel for this more involved task
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "detail": "Creates a virtual environment (if it doesn't exist), activates it, and installs AnkiTools in editable mode."
+        }
+    ]
+}

@@ -1,0 +1,42 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "AnkiTools CLI (using .venv)",
+            "type": "python",
+            "request": "launch",
+            "module": "ankitools_lib.cli.main",
+            "args": [
+                "list", 
+                "decks"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/ankitools_project", 
+            "envFile": "${workspaceFolder}/ankitools_project/.env", 
+            // Explicitly set the Python interpreter from the virtual environment
+            "python": "${workspaceFolder}/ankitools_project/.venv/Scripts/python.exe", // For Windows
+            "env": {
+                // PYTHONPATH might not be strictly necessary if python points to venv
+                // and package is installed editable, but doesn't hurt.
+                "PYTHONPATH": "${workspaceFolder}/ankitools_project/src"
+            }
+        },
+        {
+            "name": "AnkiTools CLI: Current File (using .venv)",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}", 
+            "args": [],
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/ankitools_project", 
+            "envFile": "${workspaceFolder}/ankitools_project/.env",
+            // Explicitly set the Python interpreter from the virtual environment
+            "python": "${workspaceFolder}/ankitools_project/.venv/Scripts/python.exe", // For Windows
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/ankitools_project/src"
+            }
+        }
+    ]
+}

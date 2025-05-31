@@ -3,6 +3,8 @@ from typing_extensions import Annotated
 from rich.console import Console
 from rich.table import Table
 from typing import List, Optional
+from pathlib import Path # Added
+import click # Added
 
 import sys # For reading from stdin
 from ...card_generators.arithmetic import generate_arithmetic_problems, parse_operands_str
@@ -94,7 +96,10 @@ if __name__ == "__main__":
 
 @app.command("spelling")
 def generate_spelling_cmd(
-    input_file: Annotated[typer.Path(exists=True, file_okay=True, dir_okay=False, readable=True), typer.Option(help="Path to a newline-delimited text file containing words.")],
+    input_file: Annotated[Path, typer.Option(
+        help="Path to a newline-delimited text file containing words.",
+        click_type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, path_type=Path)
+    )],
     deck_name: Annotated[str, typer.Option(help="The name of the Anki deck to add cards to.")],
     disable_run_tag: Annotated[bool, typer.Option("--disable-run-tag", help="Disable tagging notes with a run-specific UUID.")] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Print actions but don't modify Anki.")] = False,
@@ -156,7 +161,10 @@ def generate_spelling_cmd(
 @app.command("poetry")
 def generate_poetry_cmd(
     deck_name: Annotated[str, typer.Option(help="The Anki deck to add cards to.")],
-    input_file: Annotated[Optional[typer.Path(exists=True, file_okay=True, dir_okay=False, readable=True)], typer.Option(help="Path to a text file containing the poem (Title, Author, Lines...). Reads from stdin if not provided.")] = None,
+    input_file: Annotated[Optional[Path], typer.Option(
+        help="Path to a text file containing the poem (Title, Author, Lines...). Reads from stdin if not provided.",
+        click_type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, path_type=Path)
+    )] = None,
     disable_run_tag: Annotated[bool, typer.Option("--disable-run-tag", help="Disable tagging notes with a run-specific UUID.")] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Print actions but don't modify Anki.")] = False,
 ):
@@ -260,7 +268,10 @@ def generate_poetry_cmd(
 @app.command("sequence")
 def generate_sequence_cmd(
     deck_name: Annotated[str, typer.Option(help="The Anki deck to add cards to.")],
-    input_file: Annotated[Optional[typer.Path(exists=True, file_okay=True, dir_okay=False, readable=True)], typer.Option(help="Path to a text file containing the sequence (Title, then Elements...). Reads from stdin if not provided.")] = None,
+    input_file: Annotated[Optional[Path], typer.Option(
+        help="Path to a text file containing the sequence (Title, then Elements...). Reads from stdin if not provided.",
+        click_type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, path_type=Path)
+    )] = None,
     disable_run_tag: Annotated[bool, typer.Option("--disable-run-tag", help="Disable tagging notes with a run-specific UUID.")] = False,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Print actions but don't modify Anki.")] = False,
 ):
