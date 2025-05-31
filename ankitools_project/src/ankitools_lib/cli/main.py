@@ -8,7 +8,7 @@ from ..ai_services import configure_gemini_globally # To configure AI early
 from ..anki_connect import test_connection as test_anki_connection # To test Anki connection
 
 # Import command modules here once they are created
-# from .commands import generate_cmds, list_cmds, transform_cmds
+from .commands import list_cmds, generate_cmds, transform_cmds
 
 app = typer.Typer(
     name="ankitools",
@@ -60,9 +60,9 @@ def main_callback(
 
 
 # Register command groups from other files
-# app.add_typer(generate_cmds.app, name="generate", help="Generate various types of Anki notes.")
-# app.add_typer(list_cmds.app, name="list", help="List Anki information (e.g., decks).")
-# app.add_typer(transform_cmds.app, name="transform", help="Transform existing Anki notes.")
+app.add_typer(list_cmds.app, name="list", help="List Anki information (e.g., decks).")
+app.add_typer(generate_cmds.app, name="generate", help="Generate various types of Anki notes.")
+app.add_typer(transform_cmds.app, name="transform", help="Transform existing Anki notes.")
 
 
 # A simple command to test Anki connection directly from the CLI
