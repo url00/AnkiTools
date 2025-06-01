@@ -12,19 +12,19 @@ from ..ai_services import generate_rephrased_prompts as ai_generate_rephrased_pr
 # AI services configuration is handled by the CLI entry point
 
 def transform_notes_to_random_basic(
-    deck_name: str,
+    query: str,
     prompt_field_name: str,
     num_variations: int = 2,
     max_notes_to_process: Optional[int] = None, # 0 or None for no limit
     dry_run: bool = False
 ) -> Dict[str, Any]:
     """
-    Transforms 'Basic' model notes in a specified deck to 'RandomBasic' style.
+    Transforms 'Basic' model notes matching a specified Anki query to 'RandomBasic' style.
     It rephrases content from `prompt_field_name` using AI, combines variations,
     and updates the note's model and field.
 
     Args:
-        deck_name (str): The Anki deck to process.
+        query (str): The Anki search query to find notes to process.
         prompt_field_name (str): The field containing the original prompt (e.g., 'Front').
         num_variations (int, optional): Number of AI rephrased variations. Defaults to 2.
         max_notes_to_process (Optional[int], optional): Max notes to process. None or 0 for no limit. Defaults to None.
@@ -46,11 +46,11 @@ def transform_notes_to_random_basic(
         "errors_general": []
     }
 
-    anki_query = f'deck:"{deck_name}"'
-    print(f"Finding notes in deck: \"{deck_name}\" (query: \"{anki_query}\")")
+    # anki_query is now directly the 'query' parameter
+    print(f"Finding notes with query: \"{query}\"")
 
     try:
-        note_ids = anki_find_notes(anki_query)
+        note_ids = anki_find_notes(query)
         if note_ids is None:
             results_summary["errors_general"].append("Failed to retrieve notes from Anki (findNotes returned None).")
             return results_summary

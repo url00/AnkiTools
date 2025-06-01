@@ -15,23 +15,24 @@ console = Console()
 
 @app.command("random-basic")
 def transform_random_basic_cmd(
-    deck_name: Annotated[str, typer.Option(help="The Anki deck to process notes from.")],
+    query: Annotated[str, typer.Option("--query", "-q", help="Anki search query to select notes for transformation (required).")],
     prompt_field: Annotated[str, typer.Option(help="Name of the field containing the original prompt (e.g., 'Front').")],
     num_variations: Annotated[int, typer.Option(help="Number of AI-generated rephrased variations.")] = 2,
     max_notes: Annotated[Optional[int], typer.Option(help="Maximum number of notes to process (0 or omit for no limit).")] = None,
     dry_run: Annotated[bool, typer.Option("--dry-run", help="Print changes but don't modify Anki.")] = False,
 ):
     """
-    Transforms 'Basic' model notes into 'RandomBasic' style using AI rephrasing.
+    Transforms 'Basic' model notes matching the given Anki QUERY into 'RandomBasic' style.
     
     It rephrases content from the specified PROMPT_FIELD, combines variations,
     updates the note's model to 'RandomBasic', and updates the field.
+    The QUERY must be a valid Anki search string.
     """
     if not test_anki_connection_lib():
         console.print("[bold red]Failed to connect to AnkiConnect.[/bold red] Ensure Anki is running with AnkiConnect addon.")
         raise typer.Exit(code=1)
 
-    console.print(f"Starting 'RandomBasic' transformation for deck '{deck_name}' on field '{prompt_field}'...")
+    console.print(f"Starting 'RandomBasic' transformation for notes matching query '{query}' on field '{prompt_field}'...")
     if dry_run:
         console.print("[yellow]DRY RUN mode enabled. No notes will be actually modified.[/yellow]")
 
@@ -47,7 +48,7 @@ def transform_random_basic_cmd(
 
 
     summary = transform_notes_to_random_basic(
-        deck_name=deck_name,
+        query=query,
         prompt_field_name=prompt_field,
         num_variations=num_variations,
         max_notes_to_process=max_n,
@@ -59,7 +60,7 @@ def transform_random_basic_cmd(
     table.add_column(style="dim")
     table.add_column()
 
-    table.add_row("Deck Processed:", deck_name)
+    table.add_row("Query Used:", query)
     table.add_row("Prompt Field:", prompt_field)
     table.add_row("Notes Found by Query:", str(summary.get('notes_found_query', 0)))
     table.add_row("Notes Eligible (Basic model, field exists, not already transformed):", str(summary.get('notes_eligible_for_processing', 0)))
@@ -92,10 +93,10 @@ def transform_random_basic_cmd(
     elif not errors and summary.get('notes_found_query', 0) > 0 :
          console.print("\nNo notes were transformed (they might not be eligible or already processed).")
     elif not errors and summary.get('notes_found_query', 0) == 0:
-        console.print("\nNo notes found in the specified deck to process.")
+        console.print("\nNo notes found matching the specified query to process.")
 
 
 if __name__ == "__main__":
     # For testing: 
-    # python -m ankitools_lib.cli.commands.transform_cmds random-basic --deck-name "Test" --prompt-field "Front" --num-variations 1 --max-notes 5 --dry-run
+    # python -m ankitools_lib.cli.commands.transform_cmds random-basic --query "deck:Test" --prompt-field "Front" --num-variations 1 --max-notes 5 --dry-run
     app()
