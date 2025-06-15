@@ -99,3 +99,7 @@ pip install -e .
 ## License
 
 This project is licensed under the MIT License.
+
+## Acknowledgements
+
+The poetry and sequence generation features were inspired by Fernando Borretti's excellent collection of spaced repetition tools, which can be found [here](https://github.com/eudoxia0/spaced-repetition-tools).
