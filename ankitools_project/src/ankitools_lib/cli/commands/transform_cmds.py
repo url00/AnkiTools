@@ -15,11 +15,11 @@ console = Console()
 
 @app.command("random-basic")
 def transform_random_basic_cmd(
-    query: Annotated[str, typer.Option("--query", "-q", help="Anki search query to select notes for transformation (required).")],
-    prompt_field: Annotated[str, typer.Option(help="Name of the field containing the original prompt (e.g., 'Front').")],
+    query: Annotated[str, typer.Option("--query", "-q", help="Anki search query to select notes for transformation.")],
+    prompt_field: Annotated[str, typer.Option("--prompt-field", help="Name of the field containing the original prompt (e.g., 'Front').")],
     num_variations: Annotated[int, typer.Option(help="Number of AI-generated rephrased variations.")] = 2,
     max_notes: Annotated[Optional[int], typer.Option(help="Maximum number of notes to process (0 or omit for no limit).")] = None,
-    dry_run: Annotated[bool, typer.Option("--dry-run", help="Print changes but don't modify Anki.")] = False,
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="Simulate the process without making changes to Anki.")] = False,
 ):
     """
     Transforms 'Basic' model notes matching the given Anki QUERY into 'RandomBasic' style.
@@ -94,9 +94,3 @@ def transform_random_basic_cmd(
          console.print("\nNo notes were transformed (they might not be eligible or already processed).")
     elif not errors and summary.get('notes_found_query', 0) == 0:
         console.print("\nNo notes found matching the specified query to process.")
-
-
-if __name__ == "__main__":
-    # For testing: 
-    # python -m ankitools_lib.cli.commands.transform_cmds random-basic --query "deck:Test" --prompt-field "Front" --num-variations 1 --max-notes 5 --dry-run
-    app()

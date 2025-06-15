@@ -6,7 +6,7 @@
             "type": "python",
             "request": "launch",
             "module": "ankitools_lib.cli.main",
-            "args": "generate spelling --input-file ..\\example_data\\words_for_spelling.txt --deck-name Main::Learnings --dry-run",
+            "args": "generate spelling --input-file ..\\example_data\\words_for_spelling.txt --deck-name Main::Learnings",
             "console": "integratedTerminal",
             "justMyCode": true,
             "cwd": "${workspaceFolder}/ankitools_project", 

@@ -1,4 +1,7 @@
 # ankitools_lib/card_generators/poetry.py
+"""
+This module provides functions for generating Anki cards for memorizing poetry.
+"""
 
 import uuid
 from typing import List, Dict, Any, Tuple, Optional
@@ -7,11 +10,22 @@ from ..anki_connect import add_note as anki_add_note, AnkiConnectError
 
 def parse_poem_input(lines: List[str]) -> Tuple[Optional[str], Optional[str], List[str], Optional[str]]:
     """
-    Parses raw input lines into title, author, and poem lines.
-    Expected format:
-    Line 1: Title
-    Line 2: Author
-    Line 3..N: Poem lines
+    Parses raw input lines into a title, author, and list of poem lines.
+
+    The expected format is:
+    - Line 1: Poem Title
+    - Line 2: Poem Author
+    - Lines 3 to N: The lines of the poem.
+
+    Args:
+        lines: A list of strings from the input file or stdin.
+
+    Returns:
+        A tuple containing:
+        - The poem title (str)
+        - The poem author (str)
+        - A list of the poem's lines (List[str])
+        - An error message (str) if parsing fails, otherwise None.
     """
     if len(lines) < 3:
         return None, None, [], "Input format error: Expected title, author, and at least one line of the poem."
@@ -40,7 +54,20 @@ def create_poetry_anki_cards(
 ) -> Dict[str, Any]:
     """
     Generates Anki cards for a given poem and adds them to the specified deck.
-    Each card prompts for the next line given the previous one or two lines.
+    Each card prompts for the next line of the poem, providing the previous one or
+    two lines as context.
+
+    Args:
+        deck_name: The name of the Anki deck to add the cards to.
+        title: The title of the poem.
+        author: The author of the poem.
+        poem_lines: A list of strings, where each string is a line of the poem.
+        tag_run: Whether to tag the created notes with a unique run UUID.
+        dry_run: If True, simulates the process without creating notes in Anki.
+
+    Returns:
+        A dictionary summarizing the operation, including the number of notes
+        created and any errors.
     """
     results_summary = {
         "title": title,
@@ -64,18 +91,22 @@ def create_poetry_anki_cards(
     if dry_run:
         print(f"DRY RUN: Processing poem '{title}' by {author} for deck '{deck_name}'. No cards will be added.")
 
+    # Iterate through each line of the poem to create a card for it.
     for i, current_line in enumerate(poem_lines):
-        if not current_line.strip(): # Skip empty lines just in case
+        if not current_line.strip():
             continue
 
+        # Determine the context to show on the front of the card.
         context_display_lines = []
         if i == 0:
+            # For the first line, show a simple prompt.
             question_front = "<i>Beginning</i><br>..."
         elif i == 1:
+            # For the second line, show the first line as context.
             context_display_lines.append(poem_lines[0])
             question_front = f"<i>Beginning</i><br>{'<br>'.join(context_display_lines)}<br>..."
         else:
-            # Show previous two lines if available
+            # For subsequent lines, show the previous two lines as context.
             context_display_lines.append(poem_lines[i-2])
             context_display_lines.append(poem_lines[i-1])
             question_front = f"{'<br>'.join(context_display_lines)}<br>..."
@@ -86,7 +117,6 @@ def create_poetry_anki_cards(
         tags = ["ankitools-generated", "poetry"]
         if run_uuid_str:
             tags.append(run_uuid_str)
-        # Consider adding title/author as tags too, e.g., f"poetry_title_{title.replace(' ','_')}"
 
         if dry_run:
             print(f"  DRY-RUN: Would add POETRY card for line {i+1}:")
@@ -96,18 +126,14 @@ def create_poetry_anki_cards(
             results_summary["notes_created"] += 1
         else:
             try:
-                note_id = anki_add_note(deck_name, "Basic", fields, tags) # Assuming "Basic" model
+                note_id = anki_add_note(deck_name, "Basic", fields, tags)
                 if note_id:
-                    # print(f"  Added POETRY card for line {i+1} of '{title}', ID: {note_id}")
                     results_summary["notes_created"] += 1
                 else:
-                    print(f"    Failed to add POETRY card for line {i+1} of '{title}' (returned None).")
                     results_summary["errors"].append(f"Failed to add card for line {i+1} of '{title}'")
             except AnkiConnectError as e:
-                print(f"    AnkiConnect error adding card for line {i+1} of '{title}': {e}")
                 results_summary["errors"].append(f"AnkiConnect error for line {i+1} of '{title}': {e}")
             except Exception as e:
-                print(f"    Unexpected error adding card for line {i+1} of '{title}': {e}")
                 results_summary["errors"].append(f"Unexpected error for line {i+1} of '{title}': {e}")
                 
     return results_summary

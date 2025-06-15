@@ -34,9 +34,3 @@ def list_decks_cmd():
             table.add_row(str(i + 1), deck_name)
         
         console.print(table)
-
-if __name__ == "__main__":
-    # For testing this command module directly
-    # Example: python -m ankitools_lib.cli.commands.list_cmds decks
-    # Requires Anki to be running with AnkiConnect
-    app()

@@ -1,4 +1,7 @@
 # ankitools_lib/card_generators/sequence.py
+"""
+This module provides functions for generating Anki cards for memorizing sequences.
+"""
 
 import uuid
 from typing import List, Dict, Any, Tuple, Optional
@@ -7,10 +10,20 @@ from ..anki_connect import add_note as anki_add_note, AnkiConnectError
 
 def parse_sequence_input(lines: List[str]) -> Tuple[Optional[str], List[str], Optional[str]]:
     """
-    Parses raw input lines into title and sequence elements.
-    Expected format:
-    Line 1: Title
-    Line 2..N: Sequence elements
+    Parses raw input lines into a title and a list of sequence elements.
+
+    The expected format is:
+    - Line 1: Sequence Title
+    - Lines 2 to N: The elements of the sequence.
+
+    Args:
+        lines: A list of strings from the input file or stdin.
+
+    Returns:
+        A tuple containing:
+        - The sequence title (str)
+        - A list of the sequence's elements (List[str])
+        - An error message (str) if parsing fails, otherwise None.
     """
     if not lines:
         return None, [], "Input is empty."
@@ -35,7 +48,28 @@ def create_sequence_anki_cards(
     dry_run: bool = False
 ) -> Dict[str, Any]:
     """
-    Generates various Anki cards for a given sequence and adds them to the specified deck.
+    Generates a variety of Anki cards to help memorize an ordered sequence
+    and adds them to the specified deck.
+
+    This function creates several types of cards to test knowledge of the sequence:
+    - Recall all elements in order.
+    - A cloze deletion card for the entire sequence.
+    - For each element:
+        - What is element #N? (Forward)
+        - What is the position of "Element X"? (Backward)
+        - What comes after "Element X"? (Successor)
+        - What comes before "Element Y"? (Predecessor)
+
+    Args:
+        deck_name: The name of the Anki deck to add the cards to.
+        title: The title of the sequence.
+        elements: A list of strings, where each string is an element of the sequence.
+        tag_run: Whether to tag the created notes with a unique run UUID.
+        dry_run: If True, simulates the process without creating notes in Anki.
+
+    Returns:
+        A dictionary summarizing the operation, including the number of notes
+        created and any errors.
     """
     results_summary = {
         "title": title,
@@ -59,6 +93,7 @@ def create_sequence_anki_cards(
         print(f"DRY RUN: Processing sequence '{title}' for deck '{deck_name}'. No cards will be added.")
 
     def _add_card(model_name: str, fields: Dict[str, str], card_type_tag: str, context_info: str):
+        """Helper function to add a single card and handle logging."""
         nonlocal results_summary
         tags = ["ankitools-generated", "sequence", card_type_tag]
         if run_uuid_str:
@@ -77,15 +112,12 @@ def create_sequence_anki_cards(
                     results_summary["notes_created"] += 1
                 else:
                     msg = f"Failed to add {card_type_tag} card for '{title}' ({context_info})"
-                    print(f"    {msg} (returned None).")
                     results_summary["errors"].append(msg)
             except AnkiConnectError as e:
                 msg = f"AnkiConnect error adding {card_type_tag} card for '{title}' ({context_info}): {e}"
-                print(f"    {msg}")
                 results_summary["errors"].append(msg)
             except Exception as e:
                 msg = f"Unexpected error adding {card_type_tag} card for '{title}' ({context_info}): {e}"
-                print(f"    {msg}")
                 results_summary["errors"].append(msg)
 
     # 1. Recall all elements

@@ -21,12 +21,12 @@ console = Console()
 
 @app.command("arithmetic")
 def generate_arithmetic_cmd(
-    deck_name: Annotated[str, typer.Option(help="The name of the Anki deck to add cards to.")],
+    deck: Annotated[str, typer.Option(help="The name of the Anki deck to add cards to.")],
     operands: Annotated[str, typer.Option(help="A comma-delimited string of numbers (e.g., '3,7,8,9').")],
     operations: Annotated[
         str, typer.Option(help="Type of problems: 'addition', 'multiplication', or 'all'.")
     ] = "all",
-    dry_run: Annotated[bool, typer.Option("--dry-run", help="Print actions but don't modify Anki.")] = False,
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="Simulate the process without making changes to Anki.")] = False,
 ):
     """
     Generates Anki cards for arithmetic problems (addition and/or multiplication).
@@ -44,12 +44,12 @@ def generate_arithmetic_cmd(
         console.print(f"[bold red]Invalid operation type: '{operations}'.[/bold red] Choose from 'addition', 'multiplication', 'all'.")
         raise typer.Exit(code=1)
 
-    console.print(f"Starting arithmetic card generation for deck '{deck_name}'...")
+    console.print(f"Starting arithmetic card generation for deck '{deck}'...")
     if dry_run:
         console.print("[yellow]DRY RUN mode enabled. No cards will be actually added.[/yellow]")
 
     summary = generate_arithmetic_problems(
-        deck_name=deck_name,
+        deck_name=deck,
         operands_list=operands_list,
         operations_to_generate=operations.lower(), # type: ignore
         dry_run=dry_run
@@ -61,7 +61,7 @@ def generate_arithmetic_cmd(
     table.add_column()
 
     table.add_row("Run UUID:", summary.get('run_uuid', 'N/A'))
-    table.add_row("Deck Name:", deck_name)
+    table.add_row("Deck Name:", deck)
     table.add_row("Operands Processed:", str(operands_list))
     table.add_row("Operations Selected:", operations.lower())
     
@@ -90,19 +90,16 @@ def generate_arithmetic_cmd(
         console.print("\nNo new cards were added (perhaps all combinations already exist or no valid operations).")
 
 
-if __name__ == "__main__":
-    # For testing: python -m ankitools_lib.cli.commands.generate_cmds arithmetic --deck-name "TestDeck" --operands "1,2,3" --operations "all" --dry-run
-    app()
-
 @app.command("spelling")
 def generate_spelling_cmd(
     input_file: Annotated[Path, typer.Option(
+        "--input-file",
         help="Path to a newline-delimited text file containing words.",
         click_type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, path_type=Path)
     )],
-    deck_name: Annotated[str, typer.Option(help="The name of the Anki deck to add cards to.")],
+    deck: Annotated[str, typer.Option(help="The name of the Anki deck to add cards to.")],
     disable_run_tag: Annotated[bool, typer.Option("--disable-run-tag", help="Disable tagging notes with a run-specific UUID.")] = False,
-    dry_run: Annotated[bool, typer.Option("--dry-run", help="Print actions but don't modify Anki.")] = False,
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="Simulate the process without making changes to Anki.")] = False,
 ):
     """
     Generates Anki spelling cards from a file, with syllable clozes and AI descriptions.
@@ -111,13 +108,13 @@ def generate_spelling_cmd(
         console.print("[bold red]Failed to connect to AnkiConnect.[/bold red] Ensure Anki is running with AnkiConnect addon.")
         raise typer.Exit(code=1)
 
-    console.print(f"Starting spelling card generation for deck '{deck_name}' from file '{input_file}'...")
+    console.print(f"Starting spelling card generation for deck '{deck}' from file '{input_file}'...")
     if dry_run:
         console.print("[yellow]DRY RUN mode enabled. No cards will be actually added.[/yellow]")
 
     summary = generate_spelling_cards_from_file(
         input_file_path=str(input_file), # typer.Path gives Path object
-        deck_name=deck_name,
+        deck_name=deck,
         tag_run=not disable_run_tag,
         dry_run=dry_run
     )
@@ -130,7 +127,7 @@ def generate_spelling_cmd(
     if summary.get('run_uuid'):
         table.add_row("Run UUID:", summary.get('run_uuid'))
     table.add_row("Input File:", str(input_file))
-    table.add_row("Deck Name:", deck_name)
+    table.add_row("Deck Name:", deck)
     table.add_row("Words Processed:", str(summary.get('words_processed', 0)))
     
     if dry_run:
@@ -160,13 +157,14 @@ def generate_spelling_cmd(
 
 @app.command("poetry")
 def generate_poetry_cmd(
-    deck_name: Annotated[str, typer.Option(help="The Anki deck to add cards to.")],
+    deck: Annotated[str, typer.Option(help="The Anki deck to add cards to.")],
     input_file: Annotated[Optional[Path], typer.Option(
+        "--input-file",
         help="Path to a text file containing the poem (Title, Author, Lines...). Reads from stdin if not provided.",
         click_type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, path_type=Path)
     )] = None,
     disable_run_tag: Annotated[bool, typer.Option("--disable-run-tag", help="Disable tagging notes with a run-specific UUID.")] = False,
-    dry_run: Annotated[bool, typer.Option("--dry-run", help="Print actions but don't modify Anki.")] = False,
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="Simulate the process without making changes to Anki.")] = False,
 ):
     """
     Generates Anki cards for a poem, line by line with context.
@@ -219,12 +217,12 @@ def generate_poetry_cmd(
     assert title is not None
     assert author is not None
     
-    console.print(f"Starting poetry card generation for '{title}' by {author} in deck '{deck_name}'...")
+    console.print(f"Starting poetry card generation for '{title}' by {author} in deck '{deck}'...")
     if dry_run:
         console.print("[yellow]DRY RUN mode enabled. No cards will be actually added.[/yellow]")
 
     summary = create_poetry_anki_cards(
-        deck_name=deck_name,
+        deck_name=deck,
         title=title,
         author=author,
         poem_lines=poem_lines_content,
@@ -267,13 +265,14 @@ def generate_poetry_cmd(
 
 @app.command("sequence")
 def generate_sequence_cmd(
-    deck_name: Annotated[str, typer.Option(help="The Anki deck to add cards to.")],
+    deck: Annotated[str, typer.Option(help="The Anki deck to add cards to.")],
     input_file: Annotated[Optional[Path], typer.Option(
+        "--input-file",
         help="Path to a text file containing the sequence (Title, then Elements...). Reads from stdin if not provided.",
         click_type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True, path_type=Path)
     )] = None,
     disable_run_tag: Annotated[bool, typer.Option("--disable-run-tag", help="Disable tagging notes with a run-specific UUID.")] = False,
-    dry_run: Annotated[bool, typer.Option("--dry-run", help="Print actions but don't modify Anki.")] = False,
+    dry_run: Annotated[bool, typer.Option("--dry-run", help="Simulate the process without making changes to Anki.")] = False,
 ):
     """
     Generates various Anki cards for memorizing a sequence.
@@ -324,12 +323,12 @@ def generate_sequence_cmd(
     
     assert title is not None # For mypy, parse_error being None implies title is not None
     
-    console.print(f"Starting sequence card generation for '{title}' ({len(elements)} elements) in deck '{deck_name}'...")
+    console.print(f"Starting sequence card generation for '{title}' ({len(elements)} elements) in deck '{deck}'...")
     if dry_run:
         console.print("[yellow]DRY RUN mode enabled. No cards will be actually added.[/yellow]")
 
     summary = create_sequence_anki_cards(
-        deck_name=deck_name,
+        deck_name=deck,
         title=title,
         elements=elements,
         tag_run=not disable_run_tag,
