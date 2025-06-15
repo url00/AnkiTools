@@ -6,33 +6,35 @@ This tool is intended for Anki users who are comfortable with the command line a
 
 ## Features
 
-*   **Generate Arithmetic Cards:** Quickly create cards for addition and multiplication problems.
-*   **Generate Spelling Cards:** Create spelling cards from a list of words, complete with syllable-based clozes and AI-generated definitions.
-*   **Generate Poetry Cards:** Create line-by-line cards for memorizing poetry.
-*   **Generate Sequence Cards:** Create cards for memorizing ordered sequences of items.
-*   **Transform Existing Notes:** Convert standard "Basic" notes into a "RandomBasic" format, where the prompt is rephrased in multiple ways by an AI to aid in generalization.
-*   **List Decks:** List all available decks in your Anki collection.
+- **Generate Arithmetic Cards:** Quickly create cards for addition and multiplication problems.
+- **Generate Spelling Cards:** Create spelling cards from a list of words, complete with syllable-based clozes and AI-generated definitions.
+- **Generate Poetry Cards:** Create line-by-line cards for memorizing poetry.
+- **Generate Sequence Cards:** Create cards for memorizing ordered sequences of items.
+- **Transform Existing Notes:** Convert standard "Basic" notes into a "RandomBasic" format, where the prompt is rephrased in multiple ways by an AI to aid in generalization.
+- **List Decks:** List all available decks in your Anki collection.
 
 ## Installation
 
 1.  **Prerequisites:**
-    *   You must have [Anki](https://apps.ankiweb.net/) installed and running on your computer.
-    *   You must have the [AnkiConnect](https://ankiweb.net/shared/info/2055492159) add-on installed in Anki.
-    *   For the `transform random-basic` command, you must have the [Randomized Cards](https://ankiweb.net/shared/info/171015247) note type installed.
-    *   You will need a Google Gemini API key. You can obtain one from [Google AI Studio](https://aistudio.google.com/app/apikey).
+
+    - You must have [Anki](https://apps.ankiweb.net/) installed and running on your computer.
+    - You must have the [AnkiConnect](https://ankiweb.net/shared/info/2055492159) add-on installed in Anki.
+    - For the `transform random-basic` command, you must have the [Randomized Cards](https://ankiweb.net/shared/info/171015247) note type installed.
+    - You will need a Google Gemini API key. You can obtain one from [Google AI Studio](https://aistudio.google.com/app/apikey).
 
 2.  **Installation:**
-    *   Install AnkiTools using `pip`:
-        ```bash
-        pip install .
-        ```
+
+    - Install AnkiTools using `pip`:
+      ```bash
+      pip install .
+      ```
 
 3.  **Configuration:**
-    *   AnkiTools requires your Gemini API key to be set as an environment variable. Create a file named `.env` in the `ankitools_project` directory and add the following line:
-        ```
-        GEMINI_API_KEY="YOUR_API_KEY"
-        ```
-        Replace `"YOUR_API_KEY"` with your actual Gemini API key.
+    - AnkiTools requires your Gemini API key to be set as an environment variable. Create a file named `.env` in the `ankitools_project` directory and add the following line:
+      ```
+      GEMINI_API_KEY="YOUR_API_KEY"
+      ```
+      Replace `"YOUR_API_KEY"` with your actual Gemini API key.
 
 ## Usage
 
@@ -69,9 +71,10 @@ ankitools generate spelling --deck "English Vocabulary" --input-file words.txt
 ```
 
 **Output:** This will create new notes in your "English Vocabulary" deck. Each note will have:
-*   The word on the front.
-*   The word with syllable clozes on the back (e.g., `pho-to-syn-the-sis`).
-*   An AI-generated definition of the word.
+
+- The word on the front.
+- The word with syllable clozes on the back (e.g., `pho-to-syn-the-sis`).
+- An AI-generated definition of the word.
 
 #### Transforming Notes to `RandomBasic`
 
