@@ -1,10 +1,19 @@
 import os
 from dotenv import load_dotenv
 
-# Determine the project root assuming this file is at src/ankitools_lib/config.py
-# and .env is at the project root (e.g., ankitools_project/.env)
-PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-DOTENV_PATH = os.path.join(PROJECT_ROOT, '.env')
+DOTENV_PATH = os.path.join(os.getcwd(), '.env')
+
+def throw_if_spending_money_is_disabled() -> None:
+    _load_dotenv()
+    spending_money_enabled =  os.getenv("ENABLE_THINGS_THAT_COST_MONEY") == "1"
+    if not spending_money_enabled:
+        raise Exception("ENABLE_THINGS_THAT_COST_MONEY was set to false, cannot continue.")
+
+def _load_dotenv() -> None:
+    if os.path.exists(DOTENV_PATH):
+        load_dotenv(dotenv_path=DOTENV_PATH)
+    else:
+        load_dotenv() 
 
 def load_google_api_key() -> str | None:
     """
@@ -13,18 +22,8 @@ def load_google_api_key() -> str | None:
     Returns:
         str | None: The API key if found and valid, otherwise None.
     """
-    if os.path.exists(DOTENV_PATH):
-        load_dotenv(dotenv_path=DOTENV_PATH)
-    else:
-        # Fallback to loading .env from the current working directory if not found at project root.
-        # This might be useful if the library is used in a context where CWD is the project root.
-        load_dotenv() 
-        # Check if .env was loaded from CWD by checking if a key exists
-        # This is a bit indirect; a more robust way might be needed if complex scenarios arise.
-        # For now, we assume load_dotenv() without path checks standard locations or does nothing if no .env.
-        # print(f"Warning: .env file not found at {DOTENV_PATH}. Attempting to load from current working directory or environment.")
-
-
+    throw_if_spending_money_is_disabled()
+    _load_dotenv()
     api_key = os.getenv("GOOGLE_API_KEY")
     
     if not api_key:
